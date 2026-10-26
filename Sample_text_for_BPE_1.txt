@@ -1,0 +1,38 @@
+The Language Machine
+Sample corpus for BPE training
+
+In a small research laboratory, a team of curious engineers began building a language machine. Their goal was simple: create a computer program that could read sentences, recognize patterns, and generate useful responses. They knew that language was not merely a collection of separate words. Words shared letters, letters formed pieces, and pieces appeared again and again in different sentences.
+
+Every morning, the team collected text from books, stories, conversations, scientific reports, and educational articles. They cleaned the material and stored it in a training dataset. Some sentences were short, while others were long and complicated. The dataset contained common words such as the, and, language, model, data, learning, computer, and text. It also contained uncommon words such as representation, experimentation, transformation, and generalization.
+
+Their first challenge was deciding how a computer should represent text. A human reader sees a word and immediately connects it with a meaning. A computer, however, needs a numerical representation. One simple approach is to assign a different number to every complete word. This method is easy to understand, but it creates problems when the training data contains thousands or millions of different words.
+
+Imagine that the training dataset contains the word learning but never contains the word learner. A whole word tokenizer may recognize learning but fail to recognize learner. It could assign an unknown token to the new word, even though the two words share most of their letters. The engineers wanted a better solution, one that could reuse smaller pieces of language.
+
+They began with a character-level representation. Each word was divided into individual characters. The word data became d, a, t, a. The word model became m, o, d, e, l. The word learning became l, e, a, r, n, i, n, g. Every character could be represented by an integer ID, and every sequence of characters could be converted into a sequence of integers.
+
+This approach solved the problem of unseen words because familiar characters could be combined in new ways. Yet it introduced another problem. A long document could require many tokens because every character occupied its own position. The model would need to process long sequences even when several characters frequently appeared together.
+
+The engineers therefore explored a technique called Byte Pair Encoding, usually abbreviated as BPE. The central idea was straightforward. Start with small units, count which adjacent pairs occur most frequently, and merge the most frequent pair into a new unit. Repeat the process until the vocabulary reaches a chosen size or the training process reaches a stopping condition.
+
+Consider a tiny dataset containing the words low, lower, lowest, and lowly. If the characters l and o repeatedly appear together, the algorithm may merge them into lo. Later, if lo and w frequently occur next to each other, it may merge them into low. The new unit can then appear in several words without requiring the model to learn every complete word separately.
+
+Each merge creates a reusable piece. The algorithm does not need a human to decide that a particular combination is meaningful. It discovers combinations from the frequency patterns in the training data. Some learned pieces may correspond to familiar words, while others may be prefixes, suffixes, or arbitrary character sequences. Their usefulness depends on the data and the way the tokenizer is trained.
+
+During training, the engineers stored every selected pair in an ordered list. The first merge happened before the second merge, and the second happened before the third. This order mattered because a sequence might be transformed differently depending on which combinations had already been created. The final list of merge rules could later be reused when processing new text.
+
+The team also learned that tokenization and language understanding were different jobs. BPE divided text into reusable units, but it did not understand the meaning of those units. A Transformer would later receive token IDs, convert them into learned vector representations, and use attention layers to process relationships among tokens. The model could learn linguistic patterns from its training data, but the tokenizer itself did not reason about meaning.
+
+To study the algorithm, the engineers started with a deliberately small experiment. They wrote the word banana as six characters: b, a, n, a, n, a. The adjacent pairs were ba, an, na, an, and na. The pair an appeared twice, and na also appeared twice. Depending on the chosen tie-breaking rule, either pair could be merged first. This simple example demonstrated why pair counting must be implemented carefully.
+
+They then extended the experiment to several words. Repeated patterns could appear within one word or across many occurrences of different words. A practical tokenizer needed a consistent policy for word boundaries and punctuation. If each word was trained separately, a pair could not cross from the end of one word into the beginning of another. Other BPE implementations use explicit boundary markers or byte-level representations to preserve the structure of the original text.
+
+The team compared the resulting vocabulary sizes. A character tokenizer started with a relatively small set of basic symbols. As merges were added, the vocabulary grew. Frequent sequences became single tokens, while rare sequences could remain split into smaller pieces. This created a compromise between the short sequences produced by whole word tokenization and the large number of tokens produced by character-level tokenization.
+
+They evaluated the tokenizer on text that had not appeared during training. Familiar words could be represented using learned pieces, even if the complete words were new. For example, a tokenizer that had learned learn and ing might represent learning as learn followed by ing. However, this outcome was not guaranteed: it depended on the learned vocabulary, merge order, and the tokenization procedure.
+
+Another experiment examined punctuation, numbers, and capitalization. The team noticed that Hello and hello were different character sequences unless the preprocessing step converted text to lowercase. Lowercasing could reduce vocabulary size, but it also removed distinctions that sometimes mattered. Similarly, treating punctuation as separate symbols made it easier to preserve sentence structure, while removing punctuation could change the original text.
+
+As their experiments grew, the engineers focused on reproducibility. They saved the training configuration, vocabulary, merge rules, and preprocessing settings. Without these artifacts, a second program might produce different token IDs or tokenize the same sentence differently. A tokenizer was not just a vocabulary dictionary; it was a complete, ordered procedure for transforming text into model inputs and reconstructing text from those inputs.
+
+Finally, the team prepared to connect the tokenizer to a language model. During training, raw text would be transformed into token IDs. The model would learn to predict tokens from context, adjusting its parameters through optimization. During generation, the model would predict new token IDs, and the tokenizer would convert those IDs back into text. The engineers now understood the first lesson of language modeling: before a machine can learn from text, the text must be represented in a form the machine can process.
